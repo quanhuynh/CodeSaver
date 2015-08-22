@@ -8,7 +8,5 @@
 			<attribute name="javadoc_location" value="jar:file:/C:/Users/QUANHUYNH/Desktop/projects/CodeSaver/codesaver/libs/swingx-all-1.6.4-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/QUANHUYNH/Desktop/projects/CodeSaver/codesaver/libs/swingx-all-1.6.4-javadoc.jar"/>
-	<classpathentry kind="lib" path="C:/Users/QUANHUYNH/Desktop/projects/CodeSaver/codesaver/libs/swingx-all-1.6.4-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

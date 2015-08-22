@@ -14,9 +14,12 @@ import java.awt.Insets;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -33,19 +36,37 @@ import data.DBMS;
 public class MainJFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
+	//Split pane contains list of snippets on left and main panel on right
 	private JSplitPane splitPane;
+	
+	//Source of snippets and category list
 	private JPanel snippetSource;
+	
+	//Main panel on the right of the GUI
 	private JPanel mainPanel;
+	
+	//Container of categories
 	private JXTaskPaneContainer tpContainer;
+	
+	//Map from String to Category object
 	private Map<String, Category> categoryMap;
+	
+	//DBMS instance for pushing to and pulling from SQL database
 	private static DBMS dbms = DBMS.getInstance();
+	
+	//JFrame instace
 	private static MainJFrame mainFrame = new MainJFrame();
+	
+	//Information fields from main panel
 	private JTextField nameField;
-	private JTextField categoryField;
+	private JComboBox<String> categoryField;
 	private JTextArea codeField;
 	private JTextField syntaxField;
 	private JTextArea commentField;
 	
+	/**
+	 * Constructor of MainJFrame, creates all necessary components and displays them
+	 */
 	public MainJFrame() {
 		categoryMap = new HashMap<String, Category>();
 	
@@ -68,7 +89,6 @@ public class MainJFrame extends JFrame {
 		snippetSource.add(buttonContainer, BorderLayout.SOUTH);
 		//ADDING DEFAULT CATEGORY AND SNIPPET
 		snippetSource.add(new JScrollPane(tpContainer));
-		addDefault();
 		
 		//#####################
 		//## MAINPANEL SETUP ##
@@ -95,12 +115,18 @@ public class MainJFrame extends JFrame {
 		
 		c.gridx++;
 		c.anchor = GridBagConstraints.CENTER;
-		categoryField = new JTextField();
-		categoryField.setColumns(Constants.FORM_COLUMN_WIDTH);
+		c.fill = GridBagConstraints.NONE;
+		DefaultComboBoxModel<String> dlm = new DefaultComboBoxModel<String>();
+		for (String categoryName : categoryMap.keySet()) {
+			dlm.addElement(categoryName);
+		}
+		categoryField = new JComboBox<String>(dlm);
+		categoryField.setPreferredSize(nameField.getPreferredSize());
 		mainPanel.add(categoryField, c);
 		
 		//CODE
 		gbcWrap(c);
+		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.NORTHEAST;
 		mainPanel.add(new JLabel("Code:"), c);
 		
@@ -162,21 +188,32 @@ public class MainJFrame extends JFrame {
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		add(splitPane);
 		setLocationRelativeTo(null);
+		addDefault();
 		setVisible(true);
 	}
 	
+	/*
+	 * Go to the next line of the GridBagConstraints
+	 */
 	public void gbcWrap(GridBagConstraints c) {
 		c.gridx = 0;
 		c.gridy++;
 		c.anchor = GridBagConstraints.EAST;
 	}
 	
+	/**
+	 * Add the default category and snippet
+	 */
 	public void addDefault() {
 		addCategory("Default Category");
-		Snippet sampleSnippet = new Snippet("Default Snippet", "Default Category", "//foo bar", "This is a default snippet", "Java");
+		Snippet sampleSnippet = new Snippet("Sample Snippet", "Default Category", "//foo bar", "This is a sample snippet", "Java");
 		addSnippet("Default Category", sampleSnippet);
 	}
 	
+	/**
+	 * Add a category
+	 * @param name Name of category
+	 */
 	public void addCategory(String name) {
 		JXTaskPane categoryPane = new JXTaskPane();
 		Category newCategory = new Category(name);
@@ -186,39 +223,74 @@ public class MainJFrame extends JFrame {
 
 		categoryMap.put(name, newCategory);
 		tpContainer.add(categoryPane);
+		categoryField.addItem(name);
+		
 	}
 
+	/**
+	 * Add a snippet
+	 * @param categoryName Name of category
+	 * @param s Snippet object to be added
+	 */
 	public void addSnippet(String categoryName, Snippet s) {
 		categoryMap.get(categoryName).addSnippet(s);
-		JLabel snippetLabel = new JLabel(s.name());
+		JButton snippetLabel = new JButton(s.name());
+		snippetLabel.setBorder(null);
+		snippetLabel.setBackground(Constants.TRANSPARENT_COLOR);
+		snippetLabel.addActionListener(Listeners.LOAD_SNIPPET_ACTION);
 		setVisible(false);
 		categoryMap.get(categoryName).taskPane().add(snippetLabel);
 		setVisible(true);
 		
-		dbms.addSnippet(s);
+		if (!dbms.addSnippet(s)) {
+			JOptionPane.showMessageDialog(MainJFrame.getInstance(), "Failed to add snippet");
+		}
 		
 	}
 	
+	/**
+	 * Getter for name field
+	 * @return JTextField object of name
+	 */
 	public JTextField getNameField() {
 		return nameField;
 	}
 	
-	public JTextField getCategoryField() {
+	/**
+	 * Getter for category field
+	 * @return JComboBox object of category
+	 */
+	public JComboBox<String> getCategoryField() {
 		return categoryField;
 	}
 	
+	/**
+	 * Getter for syntax field
+	 * @return JTextField object of syntax
+	 */
 	public JTextField getSyntaxField() {
 		return syntaxField;
 	}
 	
+	/**
+	 * Getter for code field
+	 * @return JTextArea object of code
+	 */
 	public JTextArea getCodeField() {
 		return codeField;
 	}
 	
+	/**
+	 * Getter for comment field
+	 * @return JTextArea object of comment
+	 */
 	public JTextArea getCommentField() {
 		return commentField;
 	}
 	
+	/*
+	 * Return the instance of MainJFrame
+	 */
 	public static MainJFrame getInstance() {
 		return mainFrame;
 	}

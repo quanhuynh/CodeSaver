@@ -5,16 +5,29 @@ import utils.Constants;
 import obj.Snippet;
 
 public class DBMS {
+	//Static instance of DBMS
 	private static DBMS dbms = new DBMS();
 	
+	/**
+	 * Constructor for DMBS
+	 */
 	public DBMS() {
 		initialize();
 	}
 	
+	/**
+	 * Get the instance of DBMS
+	 * @return DBMS object
+	 */
 	public static DBMS getInstance() {
 		return dbms;
 	}
 	
+	/**
+	 * Initialize the DMBS
+	 * Registers the driver
+	 * Create the snippets table
+	 */
 	public void initialize() {
 		Constants.setProperties();
 
@@ -33,6 +46,10 @@ public class DBMS {
 		}
 	}
 	
+	/**
+	 * Establish a connection to the MySQL database
+	 * @return Connection object
+	 */
 	public Connection getConnection() {
 		try {
 			return DriverManager.getConnection(Constants.DATABASE_URL, Constants.USER_INFO);
@@ -41,6 +58,10 @@ public class DBMS {
 		}
 	}
 	
+	/**
+	 * Check if a table exists
+	 * @return true if the table exists
+	 */
 	public boolean tableExists() {
 		Connection conn;
 		try {
@@ -58,6 +79,9 @@ public class DBMS {
 		}
 	}
 	
+	/**
+	 * Create the snippets table
+	 */
 	public void createTable() {
 		Statement stm;
 		Connection conn;
@@ -79,6 +103,11 @@ public class DBMS {
 		}
 	}
 	
+	/**
+	 * Add a snippet to the table
+	 * @param s Snippet object
+	 * @return true if snippet was created successfully
+	 */
 	public boolean addSnippet(Snippet s) {
 		PreparedStatement stm;
 		Connection conn;
@@ -100,6 +129,12 @@ public class DBMS {
 		}
 	}
 	
+	/**
+	 * Change a snippet's information
+	 * @param oldS old Snippet object
+	 * @param newS new Snippet object
+	 * @return true if Snippet was changed
+	 */
 	public boolean changeSnippet(Snippet oldS, Snippet newS) {
 		PreparedStatement stm;
 		Connection conn;
@@ -127,6 +162,11 @@ public class DBMS {
 		}
 	}
 	
+	/**
+	 * Delete a snippet from the table
+	 * @param s Snippet object
+	 * @return true if snippet was deleted successfully
+	 */
 	public boolean deleteSnippet(Snippet s) {
 		PreparedStatement stm;
 		Connection conn;
@@ -143,6 +183,11 @@ public class DBMS {
 		}
 	}
 	
+	/**
+	 * Get a Snippet object from the table 
+	 * @param name Name of Snippet
+	 * @return Snippet object
+	 */
 	public Snippet getSnippetInstance(String name) {
 		PreparedStatement stm;
 		Connection conn;

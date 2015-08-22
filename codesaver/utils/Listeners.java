@@ -7,10 +7,12 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
+import data.DBMS;
 import obj.Snippet;
 import gui.MainJFrame;
 
@@ -70,16 +72,44 @@ public class Listeners {
 		}
 	};
 
+	
+
 	public static final ActionListener SAVE_SNIPPET_ACTION = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String name = MainJFrame.getInstance().getNameField().getText();
-			String category = MainJFrame.getInstance().getCategoryField().getText();
+			String category = (String) MainJFrame.getInstance().getCategoryField().getSelectedItem();
 			String code = MainJFrame.getInstance().getCodeField().getText();
 			String syntax = MainJFrame.getInstance().getSyntaxField().getText();
 			String comment = MainJFrame.getInstance().getCommentField().getText();
 			Snippet newSnippet = new Snippet(name, category, code, comment, syntax);
-			MainJFrame.getInstance().addSnippet(category, newSnippet);
+			if (name.length() == 0) {
+				JOptionPane.showMessageDialog(MainJFrame.getInstance(), "Please enter a name");
+			} else {
+				try {
+					MainJFrame.getInstance().addSnippet(category, newSnippet);
+				} catch (NullPointerException ne) {
+					JOptionPane.showMessageDialog(MainJFrame.getInstance(), "Category doesn't exist");
+				}
+			}
 		}
 	};
+
+
+	
+
+	public static final ActionListener LOAD_SNIPPET_ACTION = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Object source = e.getSource();
+			JButton snippetClicked = (JButton) source;
+			Snippet s = DBMS.getInstance().getSnippetInstance(snippetClicked.getText());
+			MainJFrame.getInstance().getNameField().setText(s.name());
+			MainJFrame.getInstance().getCategoryField().setSelectedItem(s.category());
+			MainJFrame.getInstance().getCodeField().setText(s.code());
+			MainJFrame.getInstance().getSyntaxField().setText(s.syntax());
+			MainJFrame.getInstance().getCommentField().setText(s.comment());
+		}
+	};
+
 }
