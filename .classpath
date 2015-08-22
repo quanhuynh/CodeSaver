@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="codesaver"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Program Files/MySQL/mysql-connector-java-5.0.8/mysql-connector-java-5.0.8-bin.jar"/>
+	<classpathentry kind="lib" path="C:/Users/QUANHUYNH/Desktop/projects/CodeSaver/codesaver/libs/swingx-all-1.6.4.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/QUANHUYNH/Desktop/projects/CodeSaver/codesaver/libs/swingx-all-1.6.4-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/QUANHUYNH/Desktop/projects/CodeSaver/codesaver/libs/swingx-all-1.6.4-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/Users/QUANHUYNH/Desktop/projects/CodeSaver/codesaver/libs/swingx-all-1.6.4-sources.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
