@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
+import obj.Snippet;
 import gui.MainJFrame;
 
 public class Listeners {
@@ -18,6 +19,7 @@ public class Listeners {
 	public static final ActionListener ADD_CATEGORY_ACTION = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			JFrame addCategoryFrame = new JFrame();
+			addCategoryFrame.setAlwaysOnTop(true);
 			addCategoryFrame.setTitle("Add a category");
 			addCategoryFrame.setMinimumSize(new Dimension(400, 100));
 			addCategoryFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -58,11 +60,26 @@ public class Listeners {
 	
 	};
 
-	
-	public static final ActionListener REMOVE_CATEGORY_ACTION = new ActionListener() {
+	public static final ActionListener CLEAR_FIELDS_ACTION = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
+			MainJFrame.getInstance().getNameField().setText("");
+			MainJFrame.getInstance().getCodeField().setText("");
+			MainJFrame.getInstance().getCommentField().setText("");
+			MainJFrame.getInstance().getSyntaxField().setText("");
+		}
+	};
+
+	public static final ActionListener SAVE_SNIPPET_ACTION = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String name = MainJFrame.getInstance().getNameField().getText();
+			String category = MainJFrame.getInstance().getCategoryField().getText();
+			String code = MainJFrame.getInstance().getCodeField().getText();
+			String syntax = MainJFrame.getInstance().getSyntaxField().getText();
+			String comment = MainJFrame.getInstance().getCommentField().getText();
+			Snippet newSnippet = new Snippet(name, category, code, comment, syntax);
+			MainJFrame.getInstance().addSnippet(category, newSnippet);
 		}
 	};
 }

@@ -9,7 +9,7 @@ public class Constants {
 	public static final String DATABASE_URL = "jdbc:mysql://localhost/mysql";
 	public static final String APP_NAME = "CodeSaver";
 	public static final Color TRANSPARENT_COLOR = new Color(0,0,0,0);
-	
+	public static final int FORM_COLUMN_WIDTH = 30;
 	
 	public static void setProperties() {
 		USER_INFO.setProperty("user", "root");
