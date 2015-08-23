@@ -1,7 +1,10 @@
 package data;
 import java.sql.*;
+import java.util.HashSet;
+import java.util.Set;
 
 import utils.Constants;
+import obj.Category;
 import obj.Snippet;
 
 public class DBMS {
@@ -35,7 +38,6 @@ public class DBMS {
 		try {
 			Class.forName(Constants.DATABASE_DRIVER);
 		} catch (ClassNotFoundException e) {
-			System.out.println("Database driver not found.");
 			e.printStackTrace();
 			System.exit(1);
 		}
@@ -91,15 +93,15 @@ public class DBMS {
 			
 			stm.execute("CREATE TABLE Snippets ("
 					+ "SnippetID INT NOT NULL AUTO_INCREMENT,"
-					+ "Name VARCHAR(50) UNIQUE NOT NULL,"
-					+ "Category VARCHAR(50) NOT NULL,"
+					+ "Name VARCHAR(50) NOT NULL,"
+					+ "Category VARCHAR(50) UNIQUE NOT NULL,"
 					+ "Code VARCHAR(1500) NOT NULL,"
 					+ "Comment VARCHAR(500),"
 					+ "Syntax VARCHAR(50),"
 					+ "PRIMARY KEY (SnippetID))");
 			conn.close();
 		} catch (SQLException e) {
-			System.out.println("Cannot create table. Table may already exists.");
+			
 		}
 	}
 	
@@ -111,6 +113,9 @@ public class DBMS {
 	public boolean addSnippet(Snippet s) {
 		PreparedStatement stm;
 		Connection conn;
+		if (snippetExists(s.name(), s.category())) {
+			return changeSnippet(getSnippetInstance(s.name()), s);
+		}
 		try {
 			conn = getConnection();
 			String insertSQL = "INSERT INTO snippets(Name, Category, Code, Comment, Syntax) " 
@@ -124,6 +129,27 @@ public class DBMS {
 			stm.executeUpdate();
 			conn.close();
 			return true;
+		} catch (SQLException e) {
+			return false;
+		}
+	}
+	
+	public boolean snippetExists(String name, String category) {
+		PreparedStatement stm;
+		Connection conn;
+		try {
+			conn = getConnection();
+			String checkSQL = "SELECT Name FROM Snippets WHERE Name = ? AND Category = ? ";
+			stm = conn.prepareStatement(checkSQL);
+			stm.setString(1, name);
+			stm.setString(2, category);
+			ResultSet rs = stm.executeQuery();
+			if (rs.next()) {
+				return true;
+			} else {
+				return false;
+			}
+			
 		} catch (SQLException e) {
 			return false;
 		}
@@ -180,6 +206,45 @@ public class DBMS {
 			return true;
 		} catch (SQLException e) {
 			return false;
+		}
+	}
+	
+	public Set<String> getAllCategories() {
+		Set<String> categories = new HashSet<String>();
+		PreparedStatement stm;
+		Connection conn;
+		try {
+			conn = getConnection();
+			String getAllCatsSQL = "SELECT Category FROM Snippets";
+			stm = conn.prepareStatement(getAllCatsSQL);
+			ResultSet rs = stm.executeQuery();
+			while (rs.next()) {
+				String sCat = rs.getString("Category");
+				categories.add(sCat);
+			}
+			return categories;
+		} catch (SQLException e) {
+			return categories;
+		}
+	}
+	
+	public Set<Snippet> getAllSnippets() {
+		Set<Snippet> snippets = new HashSet<Snippet>();
+		PreparedStatement stm;
+		Connection conn;
+		try {
+			conn = getConnection();
+			String getAllSQL = "SELECT Name FROM Snippets";
+			stm = conn.prepareStatement(getAllSQL);
+			ResultSet rs = stm.executeQuery();
+			while (rs.next()) {
+				String sName = rs.getString("Name");
+				Snippet s = getSnippetInstance(sName);
+				snippets.add(s);
+			}
+			return snippets;
+		} catch (SQLException e) {
+			return null;
 		}
 	}
 	

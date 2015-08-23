@@ -62,6 +62,18 @@ public class Listeners {
 	
 	};
 
+	public static final ActionListener ADD_SNIPPET_ACTION = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			MainJFrame.getInstance().setSelectedSnippet(null);
+			MainJFrame.getInstance().getNameField().setText("");
+			MainJFrame.getInstance().getCodeField().setText("");
+			MainJFrame.getInstance().getCommentField().setText("");
+			MainJFrame.getInstance().getSyntaxField().setText("");
+		}
+	};
+	
+	
 	public static final ActionListener CLEAR_FIELDS_ACTION = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -94,8 +106,6 @@ public class Listeners {
 			}
 		}
 	};
-
-
 	
 
 	public static final ActionListener LOAD_SNIPPET_ACTION = new ActionListener() {
@@ -109,6 +119,7 @@ public class Listeners {
 			MainJFrame.getInstance().getCodeField().setText(s.code());
 			MainJFrame.getInstance().getSyntaxField().setText(s.syntax());
 			MainJFrame.getInstance().getCommentField().setText(s.comment());
+			MainJFrame.getInstance().setSelectedSnippet(snippetClicked);
 		}
 	};
 

@@ -6,6 +6,7 @@ import obj.Category;
 import obj.Snippet;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -13,6 +14,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -54,7 +56,7 @@ public class MainJFrame extends JFrame {
 	//DBMS instance for pushing to and pulling from SQL database
 	private static DBMS dbms = DBMS.getInstance();
 	
-	//JFrame instace
+	//JFrame instance
 	private static MainJFrame mainFrame = new MainJFrame();
 	
 	//Information fields from main panel
@@ -64,12 +66,15 @@ public class MainJFrame extends JFrame {
 	private JTextField syntaxField;
 	private JTextArea commentField;
 	
+	//Selected components
+	private JButton selectedSnippet;
+	
 	/**
 	 * Constructor of MainJFrame, creates all necessary components and displays them
 	 */
 	public MainJFrame() {
 		categoryMap = new HashMap<String, Category>();
-	
+		
 		//SETTING UP MAIN COMPONENTS OF MAINJFRAME
 		snippetSource = new JPanel(new BorderLayout());
 		mainPanel = new JPanel();
@@ -83,6 +88,7 @@ public class MainJFrame extends JFrame {
 		JPanel buttonContainer = new JPanel(new GridLayout(2, 1));
 		JButton addSnippetButton = new JButton("New Snippet");
 		JButton addCategoryButton = new JButton("New Category");
+		addSnippetButton.addActionListener(Listeners.ADD_SNIPPET_ACTION);
 		addCategoryButton.addActionListener(Listeners.ADD_CATEGORY_ACTION);
 		buttonContainer.add(addSnippetButton);
 		buttonContainer.add(addCategoryButton);
@@ -188,7 +194,8 @@ public class MainJFrame extends JFrame {
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		add(splitPane);
 		setLocationRelativeTo(null);
-		addDefault();
+		loadCategories();
+		loadSnippets();
 		setVisible(true);
 	}
 	
@@ -210,6 +217,27 @@ public class MainJFrame extends JFrame {
 		addSnippet("Default Category", sampleSnippet);
 	}
 	
+	public void loadCategories() {
+		Set<String> categories = dbms.getAllCategories();
+		for (String cat : categories) {
+			addCategory(cat);
+		}
+	}
+	
+	public void loadSnippets() {
+		Set<Snippet> snippets = dbms.getAllSnippets();
+		for (Snippet s : snippets) {
+			categoryMap.get(s.category()).addSnippet(s);
+			JButton snippetLabel = new JButton(s.name());
+			snippetLabel.setBorder(null);
+			snippetLabel.setBackground(Constants.TRANSPARENT_COLOR);
+			snippetLabel.addActionListener(Listeners.LOAD_SNIPPET_ACTION);
+			snippetLabel.setFocusPainted(false);
+			categoryMap.get(s.category()).taskPane().add(snippetLabel);
+			repaint();
+		}
+	}
+	
 	/**
 	 * Add a category
 	 * @param name Name of category
@@ -224,7 +252,6 @@ public class MainJFrame extends JFrame {
 		categoryMap.put(name, newCategory);
 		tpContainer.add(categoryPane);
 		categoryField.addItem(name);
-		
 	}
 
 	/**
@@ -233,19 +260,18 @@ public class MainJFrame extends JFrame {
 	 * @param s Snippet object to be added
 	 */
 	public void addSnippet(String categoryName, Snippet s) {
-		categoryMap.get(categoryName).addSnippet(s);
-		JButton snippetLabel = new JButton(s.name());
-		snippetLabel.setBorder(null);
-		snippetLabel.setBackground(Constants.TRANSPARENT_COLOR);
-		snippetLabel.addActionListener(Listeners.LOAD_SNIPPET_ACTION);
-		setVisible(false);
-		categoryMap.get(categoryName).taskPane().add(snippetLabel);
-		setVisible(true);
-		
 		if (!dbms.addSnippet(s)) {
 			JOptionPane.showMessageDialog(MainJFrame.getInstance(), "Failed to add snippet");
+		} else {
+			categoryMap.get(categoryName).addSnippet(s);
+			JButton snippetLabel = new JButton(s.name());
+			snippetLabel.setBorder(null);
+			snippetLabel.setBackground(Constants.TRANSPARENT_COLOR);
+			snippetLabel.addActionListener(Listeners.LOAD_SNIPPET_ACTION);
+			snippetLabel.setFocusPainted(false);
+			categoryMap.get(categoryName).taskPane().add(snippetLabel);
+			repaint();
 		}
-		
 	}
 	
 	/**
@@ -286,6 +312,21 @@ public class MainJFrame extends JFrame {
 	 */
 	public JTextArea getCommentField() {
 		return commentField;
+	}
+	
+	/**
+	 * Set selectedSnippet JButton to be specified JButton
+	 * @param selected JButton to set
+	 */
+	public void setSelectedSnippet(JButton selected) {
+		if (selectedSnippet != null) {
+			selectedSnippet.setBackground(Constants.TRANSPARENT_COLOR);
+			repaint();
+		}
+		selectedSnippet = selected;
+		if (selected != null) {
+			selected.setBackground(new Color(153, 204, 255));
+		}
 	}
 	
 	/*
