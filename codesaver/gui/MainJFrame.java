@@ -53,6 +53,10 @@ public class MainJFrame extends JFrame {
 	//Map from String to Category object
 	private Map<String, Category> categoryMap;
 	
+	//Map from Snippet to JButton object (for easy removal)
+	private Map<String, Snippet> snippetNameMap;
+	private Map<Snippet, JButton> snippetBtnMap;
+	
 	//DBMS instance for pushing to and pulling from SQL database
 	private static DBMS dbms = DBMS.getInstance();
 	
@@ -74,6 +78,8 @@ public class MainJFrame extends JFrame {
 	 */
 	public MainJFrame() {
 		categoryMap = new HashMap<String, Category>();
+		snippetBtnMap = new HashMap<Snippet, JButton>();
+		snippetNameMap = new HashMap<String, Snippet>();
 		
 		//SETTING UP MAIN COMPONENTS OF MAINJFRAME
 		snippetSource = new JPanel(new BorderLayout());
@@ -175,8 +181,11 @@ public class MainJFrame extends JFrame {
 		saveBtn.addActionListener(Listeners.SAVE_SNIPPET_ACTION);
 		JButton clearBtn = new JButton("Clear");
 		clearBtn.addActionListener(Listeners.CLEAR_FIELDS_ACTION);
+		JButton deleteBtn = new JButton("Delete");
+		deleteBtn.addActionListener(Listeners.DELETE_SNIPPET_ACTION);
 		buttons.add(saveBtn);
 		buttons.add(clearBtn);
+		buttons.add(deleteBtn);
 		mainPanel.add(buttons, c);
 		
 		
@@ -208,15 +217,6 @@ public class MainJFrame extends JFrame {
 		c.anchor = GridBagConstraints.EAST;
 	}
 	
-	/**
-	 * Add the default category and snippet
-	 */
-	public void addDefault() {
-		addCategory("Default Category");
-		Snippet sampleSnippet = new Snippet("Sample Snippet", "Default Category", "//foo bar", "This is a sample snippet", "Java");
-		addSnippet("Default Category", sampleSnippet);
-	}
-	
 	public void loadCategories() {
 		Set<String> categories = dbms.getAllCategories();
 		for (String cat : categories) {
@@ -227,13 +227,14 @@ public class MainJFrame extends JFrame {
 	public void loadSnippets() {
 		Set<Snippet> snippets = dbms.getAllSnippets();
 		for (Snippet s : snippets) {
-			categoryMap.get(s.category()).addSnippet(s);
 			JButton snippetLabel = new JButton(s.name());
 			snippetLabel.setBorder(null);
 			snippetLabel.setBackground(Constants.TRANSPARENT_COLOR);
 			snippetLabel.addActionListener(Listeners.LOAD_SNIPPET_ACTION);
 			snippetLabel.setFocusPainted(false);
 			categoryMap.get(s.category()).taskPane().add(snippetLabel);
+			snippetNameMap.put(s.name(), s);
+			snippetBtnMap.put(s, snippetLabel);
 			repaint();
 		}
 	}
@@ -263,15 +264,23 @@ public class MainJFrame extends JFrame {
 		if (!dbms.addSnippet(s)) {
 			JOptionPane.showMessageDialog(MainJFrame.getInstance(), "Failed to add snippet");
 		} else {
-			categoryMap.get(categoryName).addSnippet(s);
 			JButton snippetLabel = new JButton(s.name());
 			snippetLabel.setBorder(null);
 			snippetLabel.setBackground(Constants.TRANSPARENT_COLOR);
 			snippetLabel.addActionListener(Listeners.LOAD_SNIPPET_ACTION);
 			snippetLabel.setFocusPainted(false);
 			categoryMap.get(categoryName).taskPane().add(snippetLabel);
+			snippetNameMap.put(s.name(), s);
+			snippetBtnMap.put(s, snippetLabel);
 			repaint();
 		}
+	}
+	
+	public void removeSnippet(JButton snippetLabel, String category) {
+		categoryMap.get(category).taskPane().remove(snippetLabel);
+		repaint();
+		Snippet s = snippetNameMap.get(snippetLabel.getText());
+		dbms.deleteSnippet(s);
 	}
 	
 	/**
@@ -313,6 +322,15 @@ public class MainJFrame extends JFrame {
 	public JTextArea getCommentField() {
 		return commentField;
 	}
+	
+	public Map<Snippet, JButton> snippetBtnMap() {
+		return snippetBtnMap;
+	}
+	
+	public Map<String, Snippet> snippetNameMap() {
+		return snippetNameMap;
+	}
+
 	
 	/**
 	 * Set selectedSnippet JButton to be specified JButton

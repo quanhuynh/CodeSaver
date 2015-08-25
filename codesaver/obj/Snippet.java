@@ -1,5 +1,7 @@
 package obj;
 
+import javax.swing.JButton;
+
 public class Snippet {
 	private String name;
 	private String category;
@@ -13,6 +15,14 @@ public class Snippet {
 		this.code = code;
 		this.comment = comment;
 		this.syntax = syntax;
+	}
+	
+	public Snippet(String name, String category) {
+		this.name = name;
+		this.category = category;
+		this.code = null;
+		this.comment = null;
+		this.syntax = null;
 	}
 	
 	public String name() {

@@ -122,5 +122,20 @@ public class Listeners {
 			MainJFrame.getInstance().setSelectedSnippet(snippetClicked);
 		}
 	};
+	
+	public static final ActionListener DELETE_SNIPPET_ACTION = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String snippetName = MainJFrame.getInstance().getNameField().getText();
+			if (snippetName.length() == 0) {
+				JOptionPane.showMessageDialog(MainJFrame.getInstance(), "Snippet can't be deleted");
+			} else {
+				String category = (String) MainJFrame.getInstance().getCategoryField().getSelectedItem();
+				JButton snippetLabel = MainJFrame.getInstance().snippetBtnMap().get(MainJFrame.getInstance().snippetNameMap().get(snippetName));
+				MainJFrame.getInstance().removeSnippet(snippetLabel, category);
+
+			}
+		}
+	};
 
 }

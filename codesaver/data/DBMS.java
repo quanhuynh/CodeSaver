@@ -94,7 +94,7 @@ public class DBMS {
 			stm.execute("CREATE TABLE Snippets ("
 					+ "SnippetID INT NOT NULL AUTO_INCREMENT,"
 					+ "Name VARCHAR(50) NOT NULL,"
-					+ "Category VARCHAR(50) UNIQUE NOT NULL,"
+					+ "Category VARCHAR(50) NOT NULL,"
 					+ "Code VARCHAR(1500) NOT NULL,"
 					+ "Comment VARCHAR(500),"
 					+ "Syntax VARCHAR(50),"
@@ -198,9 +198,10 @@ public class DBMS {
 		Connection conn;
 		try {
 			conn = getConnection();
-			String deleteSQL = "DELETE FROM Snippets WHERE Name = ? ";
+			String deleteSQL = "DELETE FROM Snippets WHERE Name = ? AND Category = ? ";
 			stm = conn.prepareStatement(deleteSQL);
 			stm.setString(1, s.name());
+			stm.setString(2, s.category());
 			stm.executeUpdate();
 			conn.close();
 			return true;
@@ -234,7 +235,7 @@ public class DBMS {
 		Connection conn;
 		try {
 			conn = getConnection();
-			String getAllSQL = "SELECT Name FROM Snippets";
+			String getAllSQL = "SELECT Name, Category FROM Snippets";
 			stm = conn.prepareStatement(getAllSQL);
 			ResultSet rs = stm.executeQuery();
 			while (rs.next()) {
